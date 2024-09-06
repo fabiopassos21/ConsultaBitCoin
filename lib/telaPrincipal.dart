@@ -10,10 +10,38 @@ class Telaprincipal extends StatefulWidget {
 }
 
 class _TelaprincipalState extends State<Telaprincipal> {
-  bitCoin() async {
-    String url = 'https://blockchain.info/ticker',
-    http.Response response = await http.get(uri.parse(url));
+  double turn = 0,
+      compraBr = 0,
+      vendaBr = 0,
+      lastBr = 0,
+      lastUs = 0,
+      lastCN = 0,
+      lastJp = 0,
+      compraUs = 0,
+      vendaUs = 0,
+      compraJP = 0,
+      vendaJP = 0,
+      compraCN = 0,
+      vendaCN = 0;
 
+  bitCoin() async {
+    String url = 'https://blockchain.info/ticker';
+    http.Response response = await http.get(Uri.parse(url));
+    // print('meu corpo do texto sla' + response.body);
+    Map<String, dynamic> retorno = json.decode(response.body);
+    setState(() {});
+    compraBr = retorno["BRL"]["buy"];
+    vendaBr = retorno["BRL"]["sell"];
+    lastBr = retorno["BRL"]["last"];
+    compraJP = retorno["JPY"]["buy"];
+    vendaJP = retorno["JPY"]["sell"];
+    lastJp = retorno["JPY"]["last"];
+    compraUs = retorno["USD"]["buy"];
+    vendaUs = retorno["USD"]["sell"];
+    lastUs = retorno["USD"]["last"];
+    compraCN = retorno["CNY"]["buy"];
+    vendaCN = retorno["CNY"]["sell"];
+    lastCN = retorno["CNY"]["last"];
   }
 
   @override
@@ -29,7 +57,9 @@ class _TelaprincipalState extends State<Telaprincipal> {
           ),
           elevation: 0,
           leading: GestureDetector(
-            onTap: () {},
+            onTap: () {
+              bitCoin;
+            },
             child: Icon(Icons.menu),
           ),
         ),
@@ -58,10 +88,28 @@ class _TelaprincipalState extends State<Telaprincipal> {
                           'Today',
                           style: TextStyle(color: Colors.white70, fontSize: 40),
                         ),
-                        Icon(
-                          Icons.refresh,
-                          color: Colors.white70,
-                        )
+                        AnimatedRotation(
+                          turns: turn,
+                          duration: Duration(seconds: 1),
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors
+                                  .transparent, // Torna o fundo transparente
+                              shadowColor:
+                                  Colors.transparent, // Remove a sombra
+                            ),
+                            onPressed: () {
+                              bitCoin();
+                              setState(() {
+                                turn += 1;
+                              });
+                            },
+                            label: Icon(
+                              Icons.refresh,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -85,10 +133,10 @@ class _TelaprincipalState extends State<Telaprincipal> {
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: [
-                          bitvalue(),
-                          bitvalue(),
-                          bitvalue(),
-                          bitvalue(),
+                          bitvalue(" BR", compraBr, vendaBr, lastBr),
+                          bitvalue(" JP", compraJP, vendaJP, lastJp),
+                          bitvalue(" US", compraUs, vendaUs, lastUs),
+                          bitvalue(" CN", compraCN, vendaCN, lastCN),
                         ],
                       ),
                     )
@@ -100,7 +148,8 @@ class _TelaprincipalState extends State<Telaprincipal> {
         ));
   }
 
-  Widget bitvalue() {
+  Widget bitvalue(
+      String sigla, double valorVenda, double ValorCompra, double last) {
     return AspectRatio(
       aspectRatio: 1,
       child: Container(
@@ -118,7 +167,7 @@ class _TelaprincipalState extends State<Telaprincipal> {
                 Padding(
                   padding: EdgeInsets.all(5),
                   child: Text(
-                    'Bitcoin',
+                    'Bitcoin' + sigla,
                     style: TextStyle(
                         fontSize: 15,
                         color: Colors.white60,
@@ -145,7 +194,7 @@ class _TelaprincipalState extends State<Telaprincipal> {
                   size: 30,
                 ),
                 Text(
-                  '3238,00',
+                  valorVenda.toString(),
                   style: TextStyle(
                     color: Colors.white60,
                   ),
@@ -164,7 +213,7 @@ class _TelaprincipalState extends State<Telaprincipal> {
                   size: 30,
                 ),
                 Text(
-                  '3238,00',
+                  ValorCompra.toString(),
                   style: TextStyle(
                     color: Colors.white60,
                   ),
@@ -188,7 +237,7 @@ class _TelaprincipalState extends State<Telaprincipal> {
                 Padding(
                   padding: EdgeInsets.all(10),
                   child: Text(
-                    '3238,00',
+                    last.toString(),
                     style: TextStyle(
                       color: Colors.white60,
                     ),
